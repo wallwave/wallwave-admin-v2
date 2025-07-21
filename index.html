@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WallWave Admin</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body onload="cekLogin(); loadKategori();">
+  <div class="header">
+    <h2>&#x1F575;&#xFE0F; WallWave Admin Panel</h2>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div class="form">
+    <h3>Tambah Kategori Baru</h3>
+    <input type="text" id="kategoriBaru" placeholder="Nama Kategori Baru" />
+    <button onclick="cekLoginLalu(tambahKategoriBaru)">Tambah Kategori</button>
+  </div>
+
+  <div class="form">
+    <h3>Tambah Wallpaper ke Kategori</h3>
+    <select id="kategoriDropdown"></select>
+    <input type="text" id="wallpaperUrl" placeholder="Link Wallpaper" />
+    <button onclick="cekLoginLalu(tambahWallpaper)">Tambah Wallpaper</button>
+  </div>
+
+  <div class="form">
+    <h3>Hapus Wallpaper dari Kategori</h3>
+    <select id="kategoriHapusDropdown"></select>
+    <input type="number" id="indexHapus" placeholder="Index Wallpaper (0-n)" />
+    <button onclick="cekLoginLalu(hapusWallpaper)">Hapus Wallpaper</button>
+  </div>
+
+  <div class="form">
+    <h3>Hapus Kategori</h3>
+    <select id="kategoriDeleteDropdown"></select>
+    <button onclick="cekLoginLalu(hapusKategori)">Hapus Kategori</button>
+  </div>
+
+  <script>
+    function cekLoginLalu(callback) {
+      const login = localStorage.getItem('wallwave_login');
+      if (login === 'true') {
+        callback();
+      } else {
+        if (confirm("Kamu harus login dulu! Mau ke halaman login?")) {
+          window.location.href = 'login.html';
+        }
+      }
+    }
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - WallWave Admin</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="login-body">
+  <div class="login-box">
+    <h2>Login Admin</h2>
+    <input type="text" id="userid" placeholder="User ID" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+  </div>
+
+  <script>
+    function login() {
+      const id = document.getElementById('userid').value;
+      const pass = document.getElementById('password').value;
+      if (id === 'wallwave' && pass === 'wallwave123') {
+        localStorage.setItem('wallwave_login', 'true');
+        window.location.href = 'index.html';
+      } else {
+        alert('Login gagal, coba lagi!');
+      }
+    }
+  </script>
+</body>
+</html>
