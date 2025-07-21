@@ -23,20 +23,24 @@ function loadKategori() {
 
   dropdowns.forEach(drop => drop.innerHTML = '');
 
-  db.ref().once('value', snapshot => {
-    snapshot.forEach(childSnapshot => {
-      const kategori = childSnapshot.key;
-      dropdowns.forEach(drop => {
-        const option = document.createElement('option');
-        option.text = kategori;
-        option.value = kategori;
-        drop.appendChild(option);
+  db.ref().once('value')
+    .then(snapshot => {
+      snapshot.forEach(childSnapshot => {
+        const kategori = childSnapshot.key;
+        dropdowns.forEach(drop => {
+          const option = document.createElement('option');
+          option.text = kategori;
+          option.value = kategori;
+          drop.appendChild(option);
+        });
       });
+    })
+    .catch(error => {
+      alert("Gagal load kategori: " + error.message);
     });
-  });
 }
 
-// Tambah kategori baru ke Firebase
+// ✅ Tambah kategori baru ke Firebase dengan verifikasi setelah set
 function tambahKategoriBaru() {
   const kategori = document.getElementById('kategoriBaru').value.trim();
   if (kategori === '') {
@@ -44,16 +48,30 @@ function tambahKategoriBaru() {
     return;
   }
 
-  db.ref(kategori).once('value', snapshot => {
-    if (snapshot.exists()) {
-      alert('Kategori sudah ada!');
-    } else {
-      db.ref(kategori).set([]);
-      alert('Kategori berhasil ditambahkan!');
-      document.getElementById('kategoriBaru').value = '';
-      loadKategori();
-    }
-  });
+  db.ref(kategori).once('value')
+    .then(snapshot => {
+      if (snapshot.exists()) {
+        alert('Kategori sudah ada!');
+        return;
+      }
+
+      // Set dummy wallpaper dan validasi setelahnya
+      return db.ref(kategori).set(["https://dummy.link/init.jpg"])
+        .then(() => db.ref(kategori).once('value'))
+        .then(verifySnap => {
+          const data = verifySnap.val();
+          if (Array.isArray(data) && data.length > 0) {
+            alert('Kategori berhasil ditambahkan!');
+            document.getElementById('kategoriBaru').value = '';
+            loadKategori();
+          } else {
+            alert('Gagal menambahkan kategori: data tidak tersimpan.');
+          }
+        });
+    })
+    .catch(err => {
+      alert("Terjadi error saat menambahkan kategori: " + err.message);
+    });
 }
 
 // Tambah wallpaper ke kategori tertentu
@@ -66,18 +84,19 @@ function tambahWallpaper() {
     return;
   }
 
-  db.ref(kategori).once('value', snapshot => {
-    let list = snapshot.val() || [];
-    list.push(url);
-    db.ref(kategori).set(list, error => {
-      if (error) {
-        alert('Gagal menambahkan wallpaper.');
-      } else {
-        alert('Wallpaper berhasil ditambahkan!');
-        document.getElementById('wallpaperUrl').value = '';
-      }
+  db.ref(kategori).once('value')
+    .then(snapshot => {
+      let list = snapshot.val() || [];
+      list.push(url);
+      return db.ref(kategori).set(list);
+    })
+    .then(() => {
+      alert('Wallpaper berhasil ditambahkan!');
+      document.getElementById('wallpaperUrl').value = '';
+    })
+    .catch(error => {
+      alert('Gagal menambahkan wallpaper: ' + error.message);
     });
-  });
 }
 
 // Hapus wallpaper dari kategori berdasarkan index
@@ -85,24 +104,25 @@ function hapusWallpaper() {
   const kategori = document.getElementById('kategoriHapusDropdown').value;
   const index = parseInt(document.getElementById('indexHapus').value);
 
-  db.ref(kategori).once('value', snapshot => {
-    let list = snapshot.val() || [];
+  db.ref(kategori).once('value')
+    .then(snapshot => {
+      let list = snapshot.val() || [];
 
-    if (isNaN(index) || index < 0 || index >= list.length) {
-      alert('Index tidak valid!');
-      return;
-    }
-
-    list.splice(index, 1);
-    db.ref(kategori).set(list, error => {
-      if (error) {
-        alert('Gagal menghapus wallpaper.');
-      } else {
-        alert('Wallpaper berhasil dihapus!');
-        document.getElementById('indexHapus').value = '';
+      if (isNaN(index) || index < 0 || index >= list.length) {
+        alert('Index tidak valid!');
+        return;
       }
+
+      list.splice(index, 1);
+      return db.ref(kategori).set(list);
+    })
+    .then(() => {
+      alert('Wallpaper berhasil dihapus!');
+      document.getElementById('indexHapus').value = '';
+    })
+    .catch(error => {
+      alert('Gagal menghapus wallpaper: ' + error.message);
     });
-  });
 }
 
 // Hapus seluruh kategori
@@ -111,13 +131,13 @@ function hapusKategori() {
   const yakin = confirm(`Yakin ingin menghapus kategori "${kategori}"? Semua data di dalamnya juga akan hilang!`);
 
   if (yakin) {
-    db.ref(kategori).remove(error => {
-      if (error) {
-        alert('Gagal menghapus kategori.');
-      } else {
+    db.ref(kategori).remove()
+      .then(() => {
         alert('Kategori berhasil dihapus!');
         loadKategori();
-      }
-    });
+      })
+      .catch(error => {
+        alert('Gagal menghapus kategori: ' + error.message);
+      });
   }
 }
