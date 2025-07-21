@@ -40,7 +40,7 @@ function loadKategori() {
     });
 }
 
-// ✅ Tambah kategori baru ke Firebase dengan array berisi string kosong
+// Tambah kategori baru ke Firebase (pakai dummy kosong)
 function tambahKategoriBaru() {
   const kategori = document.getElementById('kategoriBaru').value.trim();
   if (kategori === '') {
@@ -55,7 +55,7 @@ function tambahKategoriBaru() {
         return;
       }
 
-      // 🛡️ Kirim array berisi string kosong agar disimpan Firebase
+      // Set dummy [""] biar bisa disimpan
       return db.ref(kategori).set([""]);
     })
     .then(() => {
@@ -77,7 +77,7 @@ function tambahKategoriBaru() {
     });
 }
 
-// Tambah wallpaper ke kategori tertentu
+// ✅ Tambah wallpaper & hapus dummy otomatis jika ada
 function tambahWallpaper() {
   const kategori = document.getElementById('kategoriDropdown').value;
   const url = document.getElementById('wallpaperUrl').value.trim();
@@ -90,6 +90,12 @@ function tambahWallpaper() {
   db.ref(kategori).once('value')
     .then(snapshot => {
       let list = snapshot.val() || [];
+
+      // Buang dummy "" atau "dummy.link"
+      if (list.length === 1 && (list[0] === "" || list[0].includes("dummy.link"))) {
+        list = [];
+      }
+
       list.push(url);
       return db.ref(kategori).set(list);
     })
