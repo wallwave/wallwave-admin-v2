@@ -40,7 +40,7 @@ function loadKategori() {
     });
 }
 
-// ✅ Tambah kategori baru ke Firebase dengan verifikasi setelah set
+// ✅ Tambah kategori baru ke Firebase dengan array berisi string kosong
 function tambahKategoriBaru() {
   const kategori = document.getElementById('kategoriBaru').value.trim();
   if (kategori === '') {
@@ -55,22 +55,25 @@ function tambahKategoriBaru() {
         return;
       }
 
-      // Set dummy wallpaper dan validasi setelahnya
-      return db.ref(kategori).set(["https://dummy.link/init.jpg"])
-        .then(() => db.ref(kategori).once('value'))
-        .then(verifySnap => {
-          const data = verifySnap.val();
-          if (Array.isArray(data) && data.length > 0) {
-            alert('Kategori berhasil ditambahkan!');
-            document.getElementById('kategoriBaru').value = '';
-            loadKategori();
-          } else {
-            alert('Gagal menambahkan kategori: data tidak tersimpan.');
-          }
-        });
+      // 🛡️ Kirim array berisi string kosong agar disimpan Firebase
+      return db.ref(kategori).set([""]);
+    })
+    .then(() => {
+      return db.ref(kategori).once('value');
+    })
+    .then(verifySnap => {
+      const data = verifySnap.val();
+      if (Array.isArray(data) && data.length > 0) {
+        alert('Kategori berhasil ditambahkan!');
+        document.getElementById('kategoriBaru').value = '';
+        loadKategori();
+      } else {
+        alert('Gagal menambahkan kategori.');
+      }
     })
     .catch(err => {
       alert("Terjadi error saat menambahkan kategori: " + err.message);
+      console.error(err);
     });
 }
 
