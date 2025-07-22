@@ -4,7 +4,7 @@
 // (Kalau udah diload dari <script> di index.html, ini gak perlu)
 
 const firebaseConfig = {
-  databaseURL: "https://wallpaper-ai-zorox-default-rtdb.firebaseio.com"
+  databaseURL: "https://wallwave-wallpaper-v1-default-rtdb.firebaseio.com"
 };
 
 // ✅ Inisialisasi Firebase
