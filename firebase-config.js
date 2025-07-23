@@ -4,7 +4,7 @@
 // (Kalau udah diload dari <script> di index.html, ini gak perlu)
 
 const firebaseConfig = {
-  databaseURL: "https://wallwave-wallpaper-v1-default-rtdb.firebaseio.com/"
+  databaseURL: "https://wallwave-4k-wallpaper-4ed6f-default-rtdb.asia-southeast1.firebasedatabase.app/"
 };
 
 // ✅ Inisialisasi Firebase
